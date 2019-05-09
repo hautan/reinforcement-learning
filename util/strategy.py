@@ -1,0 +1,62 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+from model.Bandit import Bandit
+
+def run_epsilon_greedy(m1, m2, m3, eps, N):
+  bandits = [Bandit(m1, 0), Bandit(m2, 0), Bandit(m3, 0)]
+  
+  data = np.empty(N)
+  
+  for i in range(N):
+    p = np.random.random()
+    if p < eps:
+      j = np.random.choice(3)
+    else:
+      j = np.argmax([b.mean for b in bandits])
+    x = bandits[j].pull()
+    bandits[j].update(x)
+    
+    data[i] = x
+    
+  cumulative_average = np.cumsum(data)/(np.arange(N) + 1)
+#  cumulative_average = np.cumsum(data)
+  
+  plt.plot(cumulative_average)
+  plt.plot(np.ones(N)*m1)
+  plt.plot(np.ones(N)*m2)
+  plt.plot(np.ones(N)*m3)
+  plt.xscale('log')
+  plt.show()
+  
+  for b in bandits:
+    print(b.mean)
+    
+  return cumulative_average
+    
+def run_optimistic_initial_value(m1, m2, m3, itv, N):
+  bandits = [Bandit(m1, itv), Bandit(m2, itv), Bandit(m3, itv)]
+  
+  data = np.empty(N)
+  
+  for i in range(N):
+    j = np.argmax([b.mean for b in bandits])
+    x = bandits[j].pull()
+    bandits[j].update(x)
+    
+    data[i] = x
+    
+  cumulative_average = np.cumsum(data)/(np.arange(N) + 1)
+#  cumulative_average = np.cumsum(data)
+  
+  plt.plot(cumulative_average)
+  plt.plot(np.ones(N)*m1)
+  plt.plot(np.ones(N)*m2)
+  plt.plot(np.ones(N)*m3)
+  plt.xscale('log')
+  plt.show()
+  
+  for b in bandits:
+    print(b.mean)
+    
+  return cumulative_average
