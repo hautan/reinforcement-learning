@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Bandit:
-  def __init__(self, m, initialValue):
+  def __init__(self, m, initialValue=0):
     self.m = m
     self.mean = initialValue
     self.N = 0
