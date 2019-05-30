@@ -5,20 +5,25 @@ from model.environment import Environment
 
 def play_game(p1: Agent, p2: Agent, env: Environment, draw=False):
     print("play game!")
-    current_layer =None
+    current_player =None
     
     while not env.game_over():
         #alternate between players
-        if current_layer == p1:
-            current_layer = p2
+        if current_player == p1:
+            current_player = p2
         else:
-            current_layer = p1
+            current_player = p1
             
+        # draw the board before the user who wants to see it makes a move
         if draw:
-            env.draw_board()
+            if draw == 1 and current_player == p1:
+                env.draw_board()
+            if draw == 2 and current_player == p2:
+                env.draw_board()            
+
             
         #make an action
-        current_layer.take_action()
+        current_player.take_action(env)
         
         #update state history
         state = env.get_state()
@@ -32,7 +37,7 @@ def play_game(p1: Agent, p2: Agent, env: Environment, draw=False):
     p1.update(env)
     p2.update(env)
     
-def get_state_hash_and_winer(env: Environment, i = 0, j = 0):
+def get_state_hash_and_winner(env: Environment, i = 0, j = 0):
     results = []
     
     for v in (0, env.x, env.o):
@@ -41,20 +46,20 @@ def get_state_hash_and_winer(env: Environment, i = 0, j = 0):
             #j goes back to 0, incerease i, unless i = 2, then we are done
             if i == 2:
                 state = env.get_state()
-                ended = env.game_over(forece_recalculate=True)
+                ended = env.game_over(force_recalculate=True)
                 winner = env.winner
                 results.append((state, winner, ended))
             else:
-                results += get_state_hash_and_winer(env, i + 1, 0)
+                results += get_state_hash_and_winner(env, i + 1, 0)
         else:
-            results += get_state_hash_and_winer(env, i, j + 1)
+            results += get_state_hash_and_winner(env, i, j + 1)
             
     return results;
 
 def initialV_o(env: Environment, state_winner_triplets):
     V = np.zeros(env.num_states)
     for state, winner, ended in state_winner_triplets:
-        is ended:
+        if ended:
             if winner == env.o:
                 v = 1
             else:
@@ -67,7 +72,7 @@ def initialV_o(env: Environment, state_winner_triplets):
 def initialV_x(env: Environment, state_winner_triplets):
     V = np.zeros(env.num_states)
     for state, winner, ended in state_winner_triplets:
-        is ended:
+        if ended:
             if winner == env.x:
                 v = 1
             else:
